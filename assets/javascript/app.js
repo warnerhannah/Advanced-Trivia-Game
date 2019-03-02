@@ -1,47 +1,49 @@
-//global variables
+// GLOBAL VARIABLES
 var intervalId;
 var correctAnswers = 0;
 var incorrectAnswers = 0;
 var questionCounter = 1;
 var countdown = 31;
 
-$("#countdown, #timeleft, #mainsection, #submitButton").hide();
+// INITIAL SCREEN SET UP 
+$("#countdown, #timeleft, #mainsection, #submitButton, #restartButton").hide();
 
-//when start is clicked begin quiz
+// WHEN USER CLICKS START
 $("#startgame").on("click", function () {
     startGame();
-    questionCounter =1;
 });
 
+// DISPLAY QUESTIONS
 function startGame() {
     setTime();
     $("#startgame").hide();
     $("#correctanswers, #incorrectanswers").hide();
     $("#countdown, #timeleft, #mainsection, #submitButton").show();
 
-    if (questionCounter===1) {
+    if (questionCounter === 1) {
         $("#q2, #q3, #q4, #q5").hide();
+        $("#q1").show();
     }
-    else if (questionCounter===2) {
+   else if (questionCounter === 2) {
         $("#q2").show();
         $("#q1, #q3, #q4, #q5").hide();
     }
-    else if (questionCounter===3) {
+    else if (questionCounter === 3) {
         $("#q3").show();
         $("#q2, #q1, #q4, #q5").hide();
     }
-    else if (questionCounter===4) {
+    else if (questionCounter === 4) {
         $("#q4").show();
         $("#q2, #q3, #q1, #q5").hide();
     }
-    else if (questionCounter===5) {
+    else if (questionCounter === 5) {
         $("#q5").show();
         $("#q2, #q3, #q4, #q1").hide();
         $("#submitbutton").html("Submit");
     }
 }
 
-//count down function and interval function
+// COUNTDOWN AND INTERVAL FUNCITONS
 function countDown() {
     countdown--;
     $("#countdown").html(countdown);
@@ -53,15 +55,17 @@ function countDown() {
     }
 }
 
+// TO RESET THE TIMER
 function setTime() {
+    countdown = 31;
     clearInterval(intervalId);
     intervalId = setInterval(countDown, 1000);
 }
 
-//if submit or next is clicked
+// IF USER PRESSES SUBMIT OR NEXT
 $("#submitButton").on("click", function () {
-    clearInterval(intervalId);
-    if (questionCounter===5) {
+    setTime()
+    if (questionCounter === 5) {
         giveAnswer();
         scoreGame();
     }
@@ -71,38 +75,54 @@ $("#submitButton").on("click", function () {
     }
 });
 
+// CHECK ANSWERS AND ALERT IF CORRECT OR INCORRECT
 function giveAnswer() {
-    var userChoice = $('input[name=answer' + questionCounter + ']:checked').val();
-        if (userChoice === "correct") {
-            alert("Correct Answer!");
-            correctAnswers++;
-            questionCounter++;
-            startGame();
-        }
-        else {
-            alert("Incorrect Answer!");
-            incorrectAnswers++;
-            questionCounter++;
-            startGame();
-        }
+    var userChoice = $('input[name=answer' + questionCounter + ']:checked');
+    if (userChoice === "correct") {
+        alert("Correct Answer!");
+        correctAnswers++;
+        questionCounter++;
+        startGame();
+    }
+    else {
+        alert("Incorrect Answer!");
+        incorrectAnswers++;
+        questionCounter++;
+        startGame();
+    }
 
 }
 
-//tally and display final score
+// TALLY FINAL SCORES
 function scoreGame() {
     clearInterval(intervalId);
     alert("Thanks for playing!")
 
-    //print scores
+    // DISPLAY FINAL SCORES
     $("#correctanswers, #incorrectanswers").show();
     $("#correctanswers").html("You got " + correctAnswers + " answers right.")
     $("#incorrectanswers").html("And " + incorrectAnswers + " answers wrong.")
 
-    //clear questions and stuff off page
     $("#countdown, #timeleft, #mainsection, button").hide();
-    $("#startgame").show().html("Restart");
-
-    for (i = 0; i < 5; i++) {
-        $('input[name=answer' + i + ']:checked').attr('checked',false);
-    }
+    $("#restartButton").show();
 };
+
+
+// RESTART GAME
+$("#restartButton").on("click", function () {
+    restartGame();
+});
+
+function restartGame() {
+    $("#startgame").show();
+    $("#countdown, #timeleft, #mainsection, #submitButton, #restartButton").hide();
+    $("#correctanswers, #incorrectanswers").hide();
+
+    // for (i = 0; i < 5; i++) {
+    //     $('input[name=answer' + i + ']:checked').attr('checked', false);
+    // }
+
+    correctAnswers= 0;
+    incorrectAnswers=0;
+    questionCounter = 1;
+}

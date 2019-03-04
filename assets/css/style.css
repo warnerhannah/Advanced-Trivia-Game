@@ -51,3 +51,12 @@ form {
     text-align: left;
     margin-left: 40%;
 }
+
+.answers {
+    font-weight: normal;
+}
+
+.answers:hover {
+    font-weight: bold;
+    cursor: pointer;
+}

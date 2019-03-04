@@ -1,128 +1,180 @@
-// GLOBAL VARIABLES
-var intervalId;
+// ARRAY
+var questionsArray = [
+    { // index 0 question1
+        question: "How long is New Zealand's Ninety Mile Beach?", 
+        answers: {
+            a: "55 Miles",
+            b: "90 Miles",
+            c: "92 Miles",
+            d: "75 Miles",
+        },
+        correctAnswer: "a"
+    },
+    { // index 1 question2
+        question: "What was Walt Disney afraid of?", 
+        answers: {
+            a: "Driving",
+            b: "Clowns",
+            c: "Mice",
+            d: "Death",
+        },
+        correctAnswer: "c"
+    },
+    { // index 2 question 3
+        question: "How many states border the Gulf of Mexico?", 
+        answers: {
+            a: "2",
+            b: "6",
+            c: "3",
+            d: "5",
+        },
+        correctAnswer: "d"
+    },
+    { // index 3 question4
+        question: "Who averaged one patent every 3 weeks of their life?", 
+        answers: {
+            a: "Thomas Edison",
+            b: "Benjamin Franklin",
+            c: "Sir Isaac Newton",
+            d: "Nikola Tesla",
+        },
+        correctAnswer: "a"
+    },
+    { // index 4 question5
+        question: "What is the most common atmospheric gas?", 
+        answers: {
+            a: "Carbon",
+            b: "Nitrogen",
+            c: "Hydrogen",
+            d: "Oxygen",
+        },
+        correctAnswer: "b"
+    }
+];
+
+// DEFINE VARIABLES 
+var timeLeft = 31;
 var correctAnswers = 0;
 var incorrectAnswers = 0;
-var questionCounter = 1;
-var countdown = 31;
+var timeInterval ;
+var questionIndex = 0;
 
-// INITIAL SCREEN SET UP 
-$("#countdown, #timeleft, #mainsection, #submitButton, #restartButton").hide();
 
-// WHEN USER CLICKS START
-$("#startgame").on("click", function () {
-    startGame();
-});
-
-// DISPLAY QUESTIONS
-function startGame() {
-    setTime();
-    $("#startgame").hide();
-    $("#correctanswers, #incorrectanswers").hide();
-    $("#countdown, #timeleft, #mainsection, #submitButton").show();
-
-    if (questionCounter === 1) {
-        $("#q2, #q3, #q4, #q5").hide();
-        $("#q1").show();
-    }
-   else if (questionCounter === 2) {
-        $("#q2").show();
-        $("#q1, #q3, #q4, #q5").hide();
-    }
-    else if (questionCounter === 3) {
-        $("#q3").show();
-        $("#q2, #q1, #q4, #q5").hide();
-    }
-    else if (questionCounter === 4) {
-        $("#q4").show();
-        $("#q2, #q3, #q1, #q5").hide();
-    }
-    else if (questionCounter === 5) {
-        $("#q5").show();
-        $("#q2, #q3, #q4, #q1").hide();
-        $("#submitbutton").html("Submit");
-    }
-}
-
-// COUNTDOWN AND INTERVAL FUNCITONS
+// INTERVAL COUNTDOWN 
 function countDown() {
-    countdown--;
-    $("#countdown").html(countdown);
-    if (countdown === 0) {
-        alert("Time is up!");
-        clearInterval(intervalId);
-        giveAnswer();
-        startGame();
-    }
-}
+    timeLeft=31;
 
-// TO RESET THE TIMER
-function setTime() {
-    countdown = 31;
-    clearInterval(intervalId);
-    intervalId = setInterval(countDown, 1000);
-}
+    clearInterval(timeInterval);
+    timeInterval= setInterval(function() {
+        timeLeft--;
+        $("#countdown").html(timeLeft);
 
-// IF USER PRESSES SUBMIT OR NEXT
-$("#submitButton").on("click", function () {
-    setTime()
-    if (questionCounter === 5) {
-        giveAnswer();
-        scoreGame();
-    }
-    else {
-        giveAnswer();
-        startGame();
-    }
-});
-
-// CHECK ANSWERS AND ALERT IF CORRECT OR INCORRECT
-function giveAnswer() {
-    var userChoice = $('input[name=answer' + questionCounter + ']:checked');
-    if (userChoice === "correct") {
-        alert("Correct Answer!");
-        correctAnswers++;
-        questionCounter++;
-        startGame();
-    }
-    else {
-        alert("Incorrect Answer!");
-        incorrectAnswers++;
-        questionCounter++;
-        startGame();
-    }
-
-}
-
-// TALLY FINAL SCORES
-function scoreGame() {
-    clearInterval(intervalId);
-    alert("Thanks for playing!")
-
-    // DISPLAY FINAL SCORES
-    $("#correctanswers, #incorrectanswers").show();
-    $("#correctanswers").html("You got " + correctAnswers + " answers right.")
-    $("#incorrectanswers").html("And " + incorrectAnswers + " answers wrong.")
-
-    $("#countdown, #timeleft, #mainsection, button").hide();
-    $("#restartButton").show();
+        // IF TIMER RUNS OUT, SHOW ANSWER SCREEN 
+        if (timeLeft === 0 ) {
+            giveAnswer();
+            clearInterval(timeInterval);
+        }
+    }, 1000);
 };
 
+// CREATE STARTUP SCREEN 
+// HIDE EVERYTHING
+$("#next, #timeleft, #countdown, #correctanswers, #incorrectanswers, #mainsection, #restartbutton, #submitbutton").hide();
 
-// RESTART GAME
-$("#restartButton").on("click", function () {
-    restartGame();
+// CLICK START 
+$("#startbutton").on("click", startGame);
+
+function startGame() {
+    // HIDE START BUTTON
+    $("#next, #correctanswers, #incorrectanswers, #restartbutton").hide();
+    $("#startbutton").hide();
+    // DISPLAY OTHER FEATURES
+    $("#timeleft, #countdown, #mainsection").show();
+    // START COUNTDOWN 
+    displayQuestion();
+};
+
+function displayQuestion() {
+    // SHOW QUESTION 
+    countDown();
+
+    $("#timeleft, #countdown").show();
+    $("#next").hide();
+    $("#a, #b, #c, #d").show();
+    $(".question").html(questionsArray[questionIndex].question);
+    // SHOW ANSWERS
+    $("#answer1").html(questionsArray[questionIndex].answers.a);
+    $("#answer2").html(questionsArray[questionIndex].answers.b);
+    $("#answer3").html(questionsArray[questionIndex].answers.c);
+    $("#answer4").html(questionsArray[questionIndex].answers.d);
+}
+
+$(".answers").click(function() {
+    giveAnswer();
+    var answerTag = questionsArray[questionIndex].correctAnswer 
+    var userChoice = $(this).attr("id");
+    if (userChoice === answerTag) {
+        correctAnswers++;
+    }
+    else {
+        incorrectAnswers++;
+    }
 });
 
-function restartGame() {
-    $("#startgame").show();
-    $("#countdown, #timeleft, #mainsection, #submitButton, #restartButton").hide();
-    $("#correctanswers, #incorrectanswers").hide();
+// ANSWER SCREEN 
+function giveAnswer() {
+    // HIDE COUNTDOWN AND TIME REMAINING
+    $("#timeleft, #countdown").hide();
+    $("#next").show();
+    var answerTag = questionsArray[questionIndex].correctAnswer;
+    // HIDE ALL INCORRECT ANSWERS
+    // SHOW QUESTION AND CORRECT ANSWER ONLY 
+    if (answerTag === "a") {
+        $("#a, #b, #c, #d").hide();
+        $("#a").show();
+    }
+    else if (answerTag === "b") {
+        $("#a, #c, #d").hide();
+    }
+    else if (answerTag === "c") {
+        $("#a, #b, #d").hide();
+    }
+    else {
+        $("#a, #b, #c").hide();
+    };
+    // questions 1-4 IN FIVE SECONDS, GO TO SECOND QUESTION 
+    if (questionIndex<4) {
+        setTimeout(displayQuestion, 5000);
+        questionIndex++;
+    }
+    // question 5 IN FIVE SECONDS, GO TO FINAL SCORE PAGE 
+    else {
+        $("#next").html("Final Score Shown in 5 seconds...")
+        setTimeout(scoreGame, 5000);
+    };
+}
 
-    // for (i = 0; i < 5; i++) {
-    //     $('input[name=answer' + i + ']:checked').attr('checked', false);
-    // }
+// FINAL SCORE PAGE
+function scoreGame() {
+    // HIDE EVERYTHING EXCEPT NUMBER OF IN/CORRECT ANSWERS 
+    $("#mainsection, #timeleft, #countdown").hide();
+    $("#correctanswers, #incorrectanswers").show();
+    $("#correctanswers").html("You got " + correctAnswers + " right!");
+    $("#incorrectanswers").html("You got " + incorrectAnswers + " wrong!");
+    $("#restartbutton").show();
+}
 
-    correctAnswers= 0;
-    incorrectAnswers=0;
-    questionCounter = 1;
+// RESTART BUTTON 
+$("#restartbutton").click(restart);
+
+// RESTART GAME 
+function restart() {
+    // RESETS ALL GLOBAL VARIABLES 
+    timeLeft = 31;
+    incorrectAnswers = 0;
+    correctAnswers = 0;
+    timeInterval ;
+    questionIndex = 0;
+
+    startGame();
 }
